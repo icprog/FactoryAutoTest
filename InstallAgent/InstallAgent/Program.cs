@@ -103,13 +103,10 @@ namespace InstallAgent
                 {
                     if (v.Contains("BTZ1"))
                     {
-                        Console.WriteLine(v);
                         ParentPath = Directory.GetParent(v).FullName;
-                        Console.WriteLine(ParentPath);
                     }
                 }
 
-                Console.WriteLine(Path.Combine(ParentPath, Update));
                 RunProcess(Path.Combine(ParentPath, Update));
             }
             catch (Exception ex)
@@ -128,9 +125,7 @@ namespace InstallAgent
                 {
                     if (v.Contains("BTZ1"))
                     {
-                        Console.WriteLine(v);
                         ParentPath = Directory.GetParent(v).FullName;
-                        Console.WriteLine(ParentPath);
                     }
                 }
 
@@ -144,9 +139,19 @@ namespace InstallAgent
 
         static void RunAtStartup()
         {
-            var FilePath = FindFilePath(KnownFolders.Downloads.DefaultPath, TestProgramName);
             try
             {
+                var FilePath = FindFilePath(KnownFolders.Desktop.DefaultPath, TestProgramName);
+
+                FilePath.Sort((x, y) =>
+                {
+                    var versionx = FileVersionInfo.GetVersionInfo(x).ProductVersion;
+                    var versiony = FileVersionInfo.GetVersionInfo(y).ProductVersion;
+                    var VersionX = new Version(versionx);
+                    var VersionY = new Version(versiony);
+                    return -VersionX.CompareTo(VersionY);
+                });
+
                 using (RegistryKey reg = Registry.LocalMachine.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true))
                 {
                     reg.SetValue("TestProgram", "\"" + FilePath.FirstOrDefault() + "\"");
