@@ -10,6 +10,7 @@ using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace NTP
 {
@@ -89,10 +90,17 @@ namespace NTP
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                Error(ex);
                 return string.Empty;
             }
 
+        }
+
+        public static void Error(object msg)
+        {
+            Console.WriteLine(msg);
+            Debug.WriteLine(msg);
+            MessageBox.Show(msg.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         static void Main(string[] args)
@@ -108,7 +116,7 @@ namespace NTP
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                Error(ex);
                 //Environment.Exit(0);
             }
             #endregion
