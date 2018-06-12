@@ -14,7 +14,15 @@ namespace UpdateAgent
     {
         string Install = "Install.bat";
         string MacUpdate = "iqvw32.sys";
-        
+
+        public override void Extract()
+        {
+            foreach (var v in FindFilePath(KnownFolders.Downloads.DefaultPath, "*.zip"))
+            {
+                Uncompress(v, KnownFolders.Downloads.DefaultPath);
+            }
+        }
+
         public override void UpdateBios()
         {
             try
@@ -26,7 +34,8 @@ namespace UpdateAgent
                 var FilePath = FindFilePath(KnownFolders.Downloads.DefaultPath, BiosUpdate);
                 foreach (var v in FilePath)
                 {
-                    ParentPath = Directory.GetParent(v).FullName;
+                    if (v.Contains("M101B"))
+                        ParentPath = Directory.GetParent(v).FullName;
                 }
 
                 RunProcess(Path.Combine(ParentPath, Update));

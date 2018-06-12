@@ -23,7 +23,7 @@ namespace UpdateAgent
         protected string TestProgramName = "TestProgram.exe";
         protected string Ntp = "NTP.exe";
         protected string LightSensorUpdate = "STMicroSensorHubTool.exe";
-        protected string BiosUpdate = "Update_.exe";
+        protected string BiosUpdate = "*.bin";
         protected string Update = "Update.bat";
         public bool CanBiosUpdate = false;
         public bool CanLightSensorUpdate = false;
@@ -47,6 +47,11 @@ namespace UpdateAgent
         }
 
         public virtual void Readini()
+        {
+
+        }
+
+        public virtual void Extract()
         {
 
         }

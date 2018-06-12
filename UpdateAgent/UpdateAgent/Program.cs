@@ -106,12 +106,8 @@ namespace UpdateAgent
             #endregion
             Thread.Sleep(100);
 
-            #region Uncompress
-            foreach (var v in platform.FindFilePath(KnownFolders.Downloads.DefaultPath, "*.zip"))
-            {
-                if (!v.Contains("TestProgram"))
-                    platform.Uncompress(v, KnownFolders.Downloads.DefaultPath);
-            }
+            #region Extract
+            platform.Extract();
             #endregion
             Thread.Sleep(100);
 

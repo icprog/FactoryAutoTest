@@ -10,6 +10,14 @@ namespace UpdateAgent
 {
     class Bartec : Platform
     {
+        public override void Extract()
+        {
+            foreach (var v in FindFilePath(KnownFolders.Downloads.DefaultPath, "*.zip"))
+            {
+                Uncompress(v, KnownFolders.Downloads.DefaultPath);
+            }
+        }
+
         public override void UpdateBios()
         {
             try
@@ -22,9 +30,7 @@ namespace UpdateAgent
                 foreach (var v in FilePath)
                 {
                     if (v.Contains("BTZ1"))
-                    {
                         ParentPath = Directory.GetParent(v).FullName;
-                    }
                 }
 
                 RunProcess(Path.Combine(ParentPath, Update));
