@@ -92,7 +92,7 @@ namespace UpdateAgent
                     return;
 
                 string ParentPath = string.Empty;
-                var FilePath = FindFilePath(KnownFolders.Downloads.DefaultPath, MacUpdate);
+                var FilePath = FindFilePath(KnownFolders.Desktop.DefaultPath, MacUpdate);
                 foreach (var v in FilePath)
                 {
                     ParentPath = Directory.GetParent(v).FullName;
