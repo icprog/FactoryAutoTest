@@ -23,57 +23,54 @@ namespace UpdateAgent
 {
     class Program
     {
-        const string M101BProductName = "Agile_X";
-        const string BartecProductName = "Agile_X_IS";
         static Platform platform = null;
         static Platform p = new Platform();
 
-        static string GetPlatform()
-        {
-            string BIOSMainBoard = "";
-            ManagementScope managementScope;
-            ConnectionOptions connectionOptions;
+        //static string GetPlatform()
+        //{
+        //    string BIOSMainBoard = "";
+        //    ManagementScope managementScope;
+        //    ConnectionOptions connectionOptions;
 
-            try
-            {
-                connectionOptions = new ConnectionOptions();
-                connectionOptions.Impersonation = ImpersonationLevel.Impersonate;
-                connectionOptions.Authentication = AuthenticationLevel.Default;
-                connectionOptions.EnablePrivileges = true;
+        //    try
+        //    {
+        //        connectionOptions = new ConnectionOptions();
+        //        connectionOptions.Impersonation = ImpersonationLevel.Impersonate;
+        //        connectionOptions.Authentication = AuthenticationLevel.Default;
+        //        connectionOptions.EnablePrivileges = true;
 
-                managementScope = new ManagementScope();
-                managementScope.Path = new ManagementPath(@"\\" + Environment.MachineName + @"\root\CIMV2");
-                managementScope.Options = connectionOptions;
+        //        managementScope = new ManagementScope();
+        //        managementScope.Path = new ManagementPath(@"\\" + Environment.MachineName + @"\root\CIMV2");
+        //        managementScope.Options = connectionOptions;
 
-                SelectQuery selectQuery = new SelectQuery("SELECT * FROM Win32_ComputerSystemProduct");
-                ManagementObjectSearcher managementObjectSearch = new ManagementObjectSearcher(managementScope, selectQuery);
-                ManagementObjectCollection managementObjectCollection = managementObjectSearch.Get();
+        //        SelectQuery selectQuery = new SelectQuery("SELECT * FROM Win32_ComputerSystemProduct");
+        //        ManagementObjectSearcher managementObjectSearch = new ManagementObjectSearcher(managementScope, selectQuery);
+        //        ManagementObjectCollection managementObjectCollection = managementObjectSearch.Get();
 
-                foreach (ManagementObject managementObject in managementObjectCollection)
-                {
-                    BIOSMainBoard = (string)managementObject["Name"];
-                }
-            }
-            catch (Exception ex)
-            {
-                p.Error(ex);
-            }
+        //        foreach (ManagementObject managementObject in managementObjectCollection)
+        //        {
+        //            BIOSMainBoard = (string)managementObject["Name"];
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        p.Error(ex);
+        //    }
 
-            return BIOSMainBoard;
-        }
+        //    return BIOSMainBoard;
+        //}
 
         static void Init()
         {
             try
             {
-                switch (GetPlatform())
+                switch (p.GetIniValue("Model"))
                 {
-                    case M101BProductName:
                     case "M101B":
                         platform = new M101B();
                         Console.WriteLine("M101B");
                         break;
-                    case BartecProductName:
+                    case "Bartec":
                         platform = new Bartec();
                         Console.WriteLine("Bartec");
                         break;

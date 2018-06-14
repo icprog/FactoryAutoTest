@@ -87,7 +87,7 @@ namespace UpdateAgent
             }
         }
 
-        protected string GetIniValue(string Key)
+        public string GetIniValue(string Key)
         {
             try
             {
@@ -165,6 +165,11 @@ namespace UpdateAgent
                 });
 
                 using (RegistryKey reg = Registry.LocalMachine.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true))
+                {
+                    reg.SetValue("TestProgram", "\"" + FilePath.FirstOrDefault() + "\"");
+                }
+
+                using (RegistryKey reg = Registry.LocalMachine.OpenSubKey("SOFTWARE\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Run", true))
                 {
                     reg.SetValue("TestProgram", "\"" + FilePath.FirstOrDefault() + "\"");
                 }
