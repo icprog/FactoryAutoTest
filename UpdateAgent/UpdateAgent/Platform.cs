@@ -21,6 +21,7 @@ namespace UpdateAgent
     {
         protected Mutex mutex = null;
         protected string TestProgramName = "TestProgram.exe";
+        protected string BurnInAgentName = "BurnInAgent.exe";
         protected string Ntp = "NTP.exe";
         protected string LightSensorUpdate = "STMicroSensorHubTool.exe";
         protected string BiosUpdate = "*.bin";
@@ -30,6 +31,7 @@ namespace UpdateAgent
         public bool CanTestProgramRunStartup = false;
         public bool CanNtp = false;
         public bool CanMacUpdate = false;
+        public bool CanBurnInAgentRunStartup = false;
 
         public virtual void UpdateMac()
         {
@@ -94,7 +96,7 @@ namespace UpdateAgent
                 var parser = new FileIniDataParser();
                 parser.Parser.Configuration.CommentString = "#";
                 var FilePath = Assembly.GetEntryAssembly().Location;
-                IniData data = parser.ReadFile(Path.Combine(Directory.GetParent(FilePath).FullName,"config.ini"));
+                IniData data = parser.ReadFile(Path.Combine(Directory.GetParent(FilePath).FullName, "config.ini"));
                 var SectionName = data.Sections.FirstOrDefault().SectionName;
                 var FormatKey = string.Format("{0}.{1}", SectionName, Key);
                 Console.WriteLine("{0} {1}", Key, data.GetKey(FormatKey));
@@ -143,6 +145,16 @@ namespace UpdateAgent
             return FilePath;
         }
 
+        public void CreateStatupBat(string path)
+        {
+            using (StreamWriter writer = new StreamWriter(Path.Combine(KnownFolders.Startup.DefaultPath, Path.GetFileNameWithoutExtension(path) + ".bat")))
+            {
+                writer.WriteLine("@echo off");
+                writer.WriteLine("start {0}", path);
+                writer.WriteLine("exit");
+            }
+        }
+
         public void RunAtStartup()
         {
             try
@@ -164,15 +176,28 @@ namespace UpdateAgent
                     return -VersionX.CompareTo(VersionY);
                 });
 
-                using (RegistryKey reg = Registry.LocalMachine.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true))
-                {
-                    reg.SetValue("TestProgram", "\"" + FilePath.FirstOrDefault() + "\"");
-                }
+                CreateStatupBat(FilePath.FirstOrDefault());
+                Console.WriteLine("TestProgram RunAtStartup OK");
 
-                using (RegistryKey reg = Registry.LocalMachine.OpenSubKey("SOFTWARE\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Run", true))
+                if (!CanBurnInAgentRunStartup)
+                    return;
+
+                FilePath = FindFilePath(KnownFolders.Desktop.DefaultPath, BurnInAgentName);
+
+                if (!FilePath.Any())
+                    throw new Exception("BurnInAgent not found");
+
+                FilePath.Sort((x, y) =>
                 {
-                    reg.SetValue("TestProgram", "\"" + FilePath.FirstOrDefault() + "\"");
-                }
+                    var versionx = FileVersionInfo.GetVersionInfo(x).ProductVersion;
+                    var versiony = FileVersionInfo.GetVersionInfo(y).ProductVersion;
+                    var VersionX = new Version(versionx);
+                    var VersionY = new Version(versiony);
+                    return -VersionX.CompareTo(VersionY);
+                });
+
+                CreateStatupBat(FilePath.FirstOrDefault());
+                Console.WriteLine("BurnInAgent RunAtStartup OK");
             }
             catch (Exception ex)
             {

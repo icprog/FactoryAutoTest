@@ -76,6 +76,7 @@ namespace UpdateAgent
                 CanBiosUpdate = GetIniValue("BiosUpdate") != "0";
                 CanLightSensorUpdate = GetIniValue("LightSensorUpdate") != "0";
                 CanTestProgramRunStartup = GetIniValue("TestProgramRunStartup") != "0";
+                CanBurnInAgentRunStartup = GetIniValue("BurnInAgentRunStartup") != "0";
                 CanMacUpdate = GetIniValue("MacUpdate") != "0";
             }
             catch (Exception ex)
