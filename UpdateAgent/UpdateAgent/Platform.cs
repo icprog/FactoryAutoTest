@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,6 +20,17 @@ namespace UpdateAgent
 {
     public class Platform
     {
+        [DllImport("kernel32.dll")]
+        static extern uint SetThreadExecutionState(ExecutionFlag flags);
+
+        [Flags]
+        enum ExecutionFlag : uint
+        {
+            System = 0x00000001,
+            Display = 0x00000002,
+            Continus = 0x80000000,
+        }
+
         protected Mutex mutex = null;
         protected string TestProgramName = "TestProgram.exe";
         protected string BurnInAgentName = "BurnInAgent.exe";
@@ -27,6 +39,8 @@ namespace UpdateAgent
         protected string BiosUpdate = "*.bin";
         protected string UpdateBat = "Update.bat";
         protected string Update = "Update.exe";
+        protected string Install = "Install.bat";
+        protected string MacUpdate = "iqvw32.sys";
         public bool CanBiosUpdate = false;
         public bool CanLightSensorUpdate = false;
         public bool CanTestProgramRunStartup = false;
@@ -34,29 +48,105 @@ namespace UpdateAgent
         public bool CanMacUpdate = false;
         public bool CanBurnInAgentRunStartup = false;
 
-        public virtual void UpdateMac()
+        public void PreventSleep()
         {
-
+            SetThreadExecutionState(ExecutionFlag.System | ExecutionFlag.Display | ExecutionFlag.Continus);
         }
 
-        public virtual void UpdateBios()
+        public void UpdateMac()
         {
+            try
+            {
+                if (!CanMacUpdate)
+                    return;
 
+                string ParentPath = string.Empty;
+                var FilePath = FindFilePath(KnownFolders.Desktop.DefaultPath, MacUpdate);
+                foreach (var v in FilePath)
+                {
+                    ParentPath = Directory.GetParent(v).FullName;
+                }
+
+                RunProcess(Path.Combine(ParentPath, Install));
+                Thread.Sleep(200);
+                RunProcess(Path.Combine(ParentPath, UpdateBat));
+            }
+            catch (Exception ex)
+            {
+                Error(ex);
+            }
         }
 
-        public virtual void UpdateLightSensor()
+        public void UpdateBios()
         {
+            try
+            {
+                if (!CanBiosUpdate)
+                    return;
 
+                string ParentPath = string.Empty;
+                var FilePath = FindFilePath(KnownFolders.Downloads.DefaultPath, BiosUpdate);
+                foreach (var v in FilePath)
+                {
+                    ParentPath = Directory.GetParent(v).FullName;
+                }
+
+                if (FindFilePath(ParentPath, UpdateBat).Any())
+                    RunProcess(Path.Combine(ParentPath, UpdateBat));
+                else
+                    RunProcess(Path.Combine(ParentPath, Update));
+            }
+            catch (Exception ex)
+            {
+                Error(ex);
+            }
         }
 
-        public virtual void Readini()
+        public void UpdateLightSensor()
         {
+            try
+            {
+                if (!CanLightSensorUpdate)
+                    return;
 
+                string ParentPath = string.Empty;
+                var FilePath = FindFilePath(KnownFolders.Downloads.DefaultPath, LightSensorUpdate);
+                foreach (var v in FilePath)
+                {
+                    ParentPath = Directory.GetParent(v).FullName;
+                }
+
+                RunProcess(Path.Combine(ParentPath, UpdateBat));
+            }
+            catch (Exception ex)
+            {
+                Error(ex);
+            }
         }
 
-        public virtual void Extract()
+        public void Readini()
         {
+            try
+            {
+                CanNtp = GetIniValue("Ntp") != "0";
+                CanBiosUpdate = GetIniValue("BiosUpdate") != "0";
+                CanLightSensorUpdate = GetIniValue("LightSensorUpdate") != "0";
+                CanBurnInAgentRunStartup = GetIniValue("BurnInAgentRunStartup") != "0";
+                CanTestProgramRunStartup = GetIniValue("TestProgramRunStartup") != "0";
+                CanMacUpdate = GetIniValue("MacUpdate") != "0";
+            }
+            catch (Exception ex)
+            {
+                Error(ex);
+            }
+        }
 
+        public void Extract()
+        {
+            foreach (var v in FindFilePath(KnownFolders.Downloads.DefaultPath, "*.zip"))
+            {
+                Uncompress(v, KnownFolders.Downloads.DefaultPath);
+            }
         }
 
         public void AlreadyRunning()

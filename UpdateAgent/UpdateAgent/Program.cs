@@ -30,19 +30,20 @@ namespace UpdateAgent
         {
             try
             {
-                switch (p.GetIniValue("Model"))
-                {
-                    case "M101B":
-                        platform = new M101B();
-                        Console.WriteLine("M101B");
-                        break;
-                    case "Bartec":
-                        platform = new Bartec();
-                        Console.WriteLine("Bartec");
-                        break;
-                    default:
-                        throw new Exception("Platform not support");
-                }
+                platform = new Platform();
+                //switch (p.GetIniValue("Model"))
+                //{
+                //    case "M101B":
+                //        platform = new M101B();
+                //        Console.WriteLine("M101B");
+                //        break;
+                //    case "Bartec":
+                //        platform = new Bartec();
+                //        Console.WriteLine("Bartec");
+                //        break;
+                //    default:
+                //        throw new Exception("Platform not support");
+                //}
             }
             catch (Exception ex)
             {
@@ -60,6 +61,11 @@ namespace UpdateAgent
 
             #region Init
             Init();
+            #endregion
+            Thread.Sleep(100);
+
+            #region Prevent to sleep
+            platform.PreventSleep();
             #endregion
             Thread.Sleep(100);
 
