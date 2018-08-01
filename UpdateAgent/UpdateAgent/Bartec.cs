@@ -33,7 +33,10 @@ namespace UpdateAgent
                         ParentPath = Directory.GetParent(v).FullName;
                 }
 
-                RunProcess(Path.Combine(ParentPath, Update));
+                if (FindFilePath(ParentPath, UpdateBat).Any())
+                    RunProcess(Path.Combine(ParentPath, UpdateBat));
+                else
+                    RunProcess(Path.Combine(ParentPath, Update));
             }
             catch (Exception ex)
             {
@@ -58,7 +61,7 @@ namespace UpdateAgent
                     }
                 }
 
-                RunProcess(Path.Combine(ParentPath, Update));
+                RunProcess(Path.Combine(ParentPath, UpdateBat));
             }
             catch (Exception ex)
             {

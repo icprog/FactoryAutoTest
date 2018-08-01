@@ -25,7 +25,8 @@ namespace UpdateAgent
         protected string Ntp = "NTP.exe";
         protected string LightSensorUpdate = "STMicroSensorHubTool.exe";
         protected string BiosUpdate = "*.bin";
-        protected string Update = "Update.bat";
+        protected string UpdateBat = "Update.bat";
+        protected string Update = "Update.exe";
         public bool CanBiosUpdate = false;
         public bool CanLightSensorUpdate = false;
         public bool CanTestProgramRunStartup = false;
